@@ -1,0 +1,14 @@
+  mirror maker step
+1)C:\kafka_2.11-2.0.0\bin\windows>zookeeper-server-start.bat C:\kafka_2.11-2.0.0\config\zookeeper.properties (source zookeeper, run on port 2181)
+2)C:\kafka_2.11-2.0.0\bin\windows>kafka-server-start.bat c:\kafka_2.11-2.0.0\config\server.properties (source server, run on port 9092)  
+3)C:\kafka_confluent_5.3.1\bin\windows>zookeeper-server-start.bat C:\kafka_confluent_5.3.1\etc\kafka\zookeeper.properties (destination zookeeper, run on port 2182)
+4)C:\kafka_confluent_5.3.1\bin\windows>kafka-server-start.bat C:\kafka_confluent_5.3.1\etc\kafka\server.properties (destination server, run on port 9093)
+5)C:\kafka_2.11-2.0.0\bin\windows>kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 2 --topic kafka-src
+6)C:\kafka_confluent_5.3.1\bin\windows>kafka-topics.bat --create --zookeeper localhost:2182 --replication-factor 1 --partitions 2 --topic kafka-dest
+7)goto https://github.com/slavirok/mirrormaker-rename-topic-handler and download renametopichandler-1.0-SNAPSHOT.jar and keep that jar in libs folder of
+  which kafka, from where you will run kafka-mirror-maker.bat command
+  example: C:\kafka_confluent_5.3.1\libs\renametopichandler-1.0-SNAPSHOT.jar
+8) run below kafka-mirror-maker command
+   C:\kafka_confluent_5.3.1\bin\windows>kafka-mirror-maker.bat --consumer.config D:/kafkaMirrorMaker/consumer.properties --producer.config D:/kafkaMirrorMaker/producer.properties --num.streams 3 --whitelist="kafka-src" --message.handler com.slavirok.RenameTopicHandler --message.handler.args "kafka-src,kafka-dest"
+9) C:\kafka_2.11-2.0.0\bin\windows>kafka-console-producer.bat --broker-list localhost:9092 --topic kafka-src
+10)C:\kafka_confluent_5.3.1\bin\windows>kafka-console-consumer.bat --bootstrap-server localhost:9093 --topic kafka-dest --from-beginning    
